@@ -1,14 +1,14 @@
-// pages/RegisterPage.tsx
 import { useState } from "react";
+import { motion } from "motion/react";
 import { Link, useNavigate } from "react-router-dom";
-import UsernameInput     from "@/components/ui/form/UsernameInput";
-import DisplayNameInput  from "@/components/ui/form/DisplayNameInput";
+import UsernameInput from "@/components/ui/form/UsernameInput";
+import DisplayNameInput from "@/components/ui/form/DisplayNameInput";
 import { useLoginRegister } from "@/hooks/useLoginRegister";
 
 export default function RegisterPage() {
-  const [username,    setUsername]    = useState("");
+  const [username, setUsername] = useState("");
   const [displayName, setDisplayName] = useState("");
-  const { loading, error, register }  = useLoginRegister();
+  const { loading, error, register } = useLoginRegister();
   const navigate = useNavigate();
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -20,26 +20,38 @@ export default function RegisterPage() {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="w-full max-w-xs space-y-4">
-      <UsernameInput    value={username}    onChange={setUsername} autoFocus />
-      <DisplayNameInput value={displayName} onChange={setDisplayName} />
-
-      <button
-        type="submit"
-        className="btn btn-primary w-full"
-        disabled={loading}
+    <div className="flex justify-center items-center min-h-screen">
+      <motion.form
+        onSubmit={handleSubmit}
+        className="w-full max-w-xs bg-base-100 p-6 rounded-xl shadow-lg"
+        initial={{ opacity: 0, y: -50, filter: "blur(4px)" }}
+        animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+        transition={{ duration: 0.6, ease: "easeOut" }}
       >
-        {loading ? <span className="loading loading-dots loading-md"></span> : "Create account"}
-      </button>
+        <UsernameInput value={username} onChange={setUsername} autoFocus />
+        <DisplayNameInput value={displayName} onChange={setDisplayName} />
 
-      {error && <p className="text-error text-sm">{error}</p>}
+        <button
+          type="submit"
+          className="btn btn-primary w-full"
+          disabled={loading}
+        >
+          {loading ? (
+            <span className="loading loading-dots loading-md" />
+          ) : (
+            "Create account"
+          )}
+        </button>
 
-      <p className="text-center text-sm">
-        Already have an account?{" "}
-        <Link to="/login" className="link link-primary">
-          Log in
-        </Link>
-      </p>
-    </form>
+        {error && <p className="text-error text-sm mt-2">{error}</p>}
+
+        <p className="text-center text-sm pt-6">
+          Already have an account?{" "}
+          <Link to="/login" className="link link-primary">
+            Log in
+          </Link>
+        </p>
+      </motion.form>
+    </div>
   );
 }

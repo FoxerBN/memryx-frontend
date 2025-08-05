@@ -24,7 +24,7 @@ export default function DisplayNameInput({ value, onChange }: Props) {
           onChange={e => onChange(e.target.value)}
         />
       </label>
-      <p className="validator-hint text-xs">
+      <p className="validator-hint py-2 text-xs">
         3 – 30 characters, letters & numbers only
       </p>
     </>

@@ -6,7 +6,7 @@ import Footer from "@/components/layout/Footer";
 
 export default function AuthLayout() {
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="min-h-[100dvh] overflow-x-hidden flex flex-col">
       <header className="flex justify-end p-4">
         <ThemeSwitcher />
       </header>

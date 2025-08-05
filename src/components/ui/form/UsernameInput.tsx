@@ -17,17 +17,17 @@ export default function UsernameInput({ value, onChange, autoFocus }: Props) {
           type="text"
           required
           placeholder="Username"
-          pattern="[A-Za-z][A-Za-z0-9]{2,29}"
+          pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{5,}"
           minLength={3}
           maxLength={30}
-          title="3–30 chars. Letters or numbers, must start with a letter."
+          title="Must be more than 5 characters, including number, lowercase letter, uppercase letter"
           autoComplete="username"
           value={value}
           onChange={e => onChange(e.target.value)}
         />
       </label>
-      <p className="validator-hint text-xs">
-        3 – 30 characters, letters & numbers only
+      <p className="validator-hint py-2 text-xs">
+        Must be more than 5 characters, including number, lowercase letter, uppercase letter
       </p>
     </>
   );

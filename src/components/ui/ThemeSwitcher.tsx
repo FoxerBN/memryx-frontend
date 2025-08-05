@@ -32,7 +32,7 @@ export function ThemeSwitcher() {
         </div>
         <ul
           tabIndex={0}
-          className="dropdown-content bg-base-300 rounded-box z-10 w-52 p-2 shadow-2xl"
+          className="dropdown-content bg-base-300 rounded-box h-48 overflow-y-auto z-10 w-auto p-2 shadow-2xl"
         >
           {themes.map((t) => (
             <li key={t}>
