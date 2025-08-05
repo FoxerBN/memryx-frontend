@@ -23,7 +23,7 @@ export default function RegisterPage() {
     <div className="flex justify-center items-center min-h-screen">
       <motion.form
         onSubmit={handleSubmit}
-        className="w-full max-w-xs bg-base-100 p-6 rounded-xl shadow-lg"
+        className="w-full max-w-xs p-6 "
         initial={{ opacity: 0, y: -50, filter: "blur(4px)" }}
         animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
         transition={{ duration: 0.6, ease: "easeOut" }}

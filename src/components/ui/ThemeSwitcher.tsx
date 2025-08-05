@@ -6,7 +6,7 @@ const themes = ['light', 'dark', 'cupcake', 'bumblebee', 'emerald', 'corporate',
   'winter', 'procyon'] as const
 type Theme = (typeof themes)[number]
 
-export function ThemeSwitcher() {
+export default function ThemeSwitcher() {
   const [theme, setTheme] = useState<Theme>(
     (localStorage.getItem('theme') as Theme) ?? 'light'
   )
