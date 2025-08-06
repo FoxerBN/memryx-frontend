@@ -17,7 +17,7 @@ export default function ThemeSwitcher() {
   }, [theme])
 
   return (
-      <div className="dropdown mb-4">
+      <div className="dropdown">
         <div tabIndex={0} role="button" className="btn m-1">
           Theme
           <svg
