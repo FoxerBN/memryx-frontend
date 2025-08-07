@@ -1,25 +1,36 @@
-import { useRef } from "react";
-
-interface CreateFolderModalProps {
-  open: boolean;
-  onClose: () => void;
-  onCreate: (name: string) => void;
-}
+import { useRef, useEffect } from "react";
+import type { CreateFolderModalProps } from "@/interface/createModal";
 
 const CreateFolderModal = ({ open, onClose, onCreate }: CreateFolderModalProps) => {
   const inputRef = useRef<HTMLInputElement>(null);
+  const modalBoxRef = useRef<HTMLFormElement>(null);
+
+  useEffect(() => {
+    if (open) {
+      setTimeout(() => {
+        inputRef.current?.focus();
+        modalBoxRef.current?.scrollIntoView({ behavior: "smooth", block: "end" });
+      }, 200);
+    }
+  }, [open]);
 
   const handleCreate = () => {
     const value = inputRef.current?.value.trim();
     if (value && inputRef.current?.checkValidity()) {
       onCreate(value);
       onClose();
+      if (inputRef.current) inputRef.current.value = "";
     }
+  };
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    handleCreate();
   };
 
   return (
     <dialog open={open} className="modal modal-bottom sm:modal-middle">
-      <form method="dialog" className="modal-box">
+      <form ref={modalBoxRef} className="modal-box" onSubmit={handleSubmit}>
         <button
           type="button"
           className="btn btn-sm btn-circle btn-ghost absolute right-2 top-2"
@@ -48,7 +59,7 @@ const CreateFolderModal = ({ open, onClose, onCreate }: CreateFolderModalProps) 
           <button className="btn btn-outline" type="button" onClick={onClose}>
             Cancel
           </button>
-          <button className="btn btn-primary" type="button" onClick={handleCreate}>
+          <button className="btn btn-primary" type="submit">
             Create
           </button>
         </div>
