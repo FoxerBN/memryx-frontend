@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   motion,
   AnimatePresence,
@@ -13,6 +13,7 @@ import { containerVariants,springT, itemVariants } from "@/const/folderAnimation
 
 export default function Home() {
   const [view, setView] = useState<ViewType>("grid");
+  const [loading, setLoading] = useState(true); // Make loading stateful
   const [folders, setFolders] = useState([
     { id: 1, name: "English", count: 12 },
     { id: 2, name: "Mathematics", count: 7 },
@@ -27,6 +28,11 @@ export default function Home() {
   const handleCreateFolder = (name: string) => {
     setFolders((prev) => [...prev, { id: Date.now(), name, count: 0 }]);
   };
+
+  useEffect(() => {
+    const timer = setTimeout(() => setLoading(false), 2000);
+    return () => clearTimeout(timer);
+  }, []);
 
   return (
     <div className="w-full max-w-5xl mx-auto px-4">
@@ -54,24 +60,30 @@ export default function Home() {
         }
       >
         <AnimatePresence mode="popLayout">
-          {folders.map((folder) => (
-            <motion.div
-              key={folder.id}
-              layout
-              variants={itemVariants}
-              initial="hidden"
-              animate="visible"
-              exit="exit"
-              whileHover={{ scale: 1.035 }}
-              transition={{ layout: springT }}
-            >
-              <FolderItem
-                name={folder.name}
-                count={folder.count}
-                view={view}
-              />
-            </motion.div>
-          ))}
+          {loading ? (
+            Array.from({ length: 6 }).map((_, idx) => (
+              <div key={idx} className="skeleton h-20 w-auto" />
+            ))
+          ) : (
+            folders.map((folder) => (
+              <motion.div
+                key={folder.id}
+                layout
+                variants={itemVariants}
+                initial="hidden"
+                animate="visible"
+                exit="exit"
+                whileHover={{ scale: 1.035 }}
+                transition={{ layout: springT }}
+              >
+                <FolderItem
+                  name={folder.name}
+                  count={folder.count}
+                  view={view}
+                />
+              </motion.div>
+            ))
+          )}
         </AnimatePresence>
       </motion.div>
 
