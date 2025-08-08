@@ -76,11 +76,13 @@ export default function Home() {
                 whileHover={{ scale: 1.035 }}
                 transition={{ layout: springT }}
               >
+                <a href={`/folder/${folder.id}`}>
                 <FolderItem
                   name={folder.name}
                   count={folder.count}
                   view={view}
                 />
+                </a>
               </motion.div>
             ))
           )}
