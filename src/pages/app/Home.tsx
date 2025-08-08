@@ -13,7 +13,7 @@ import { containerVariants,springT, itemVariants } from "@/const/folderAnimation
 
 export default function Home() {
   const [view, setView] = useState<ViewType>("grid");
-  const [loading, setLoading] = useState(true); // Make loading stateful
+  const [loading, setLoading] = useState<boolean>(true);
   const [folders, setFolders] = useState([
     { id: 1, name: "English", count: 12 },
     { id: 2, name: "Mathematics", count: 7 },

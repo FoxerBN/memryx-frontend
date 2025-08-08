@@ -7,26 +7,27 @@ import RegisterPage from "./pages/auth/RegisterPage";
 import NotFoundPage from "./pages/NotFoundPage";
 import AuthLayout from "./pages/AuthLayout";
 import AppLayout from "./pages/AppLayout";
-
+import OneFolder from "./pages/app/flashcard/OneFolder";
 
 function App() {
   return (
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<Navigate to="/login" replace />} />
-        
+
         <Route element={<AuthLayout />}>
-                  <Route path="/login" index element={<LoginPage />} />
-                  <Route path="/register" element={<RegisterPage />} />
-                </Route>
+          <Route path="/login" index element={<LoginPage />} />
+          <Route path="/register" element={<RegisterPage />} />
+        </Route>
         <Route element={<ProtectedRoute />}>
           <Route element={<AppLayout />}>
-          <Route path="/home" element={<HomePage />} />
-          <Route path="/settings" element={<SettingsPage />} />
+            <Route path="/home" element={<HomePage />} />
+            <Route path="/settings" element={<SettingsPage />} />
           </Route>
+            <Route path="/folder/:id" element={<OneFolder />} />
         </Route>
 
-         <Route path="*" element={<NotFoundPage />} /> 
+        <Route path="*" element={<NotFoundPage />} />
       </Routes>
     </BrowserRouter>
   );
