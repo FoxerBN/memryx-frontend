@@ -3,8 +3,8 @@ import {
   motion,
   AnimatePresence,
 } from "motion/react";
-import CreateFolderModal from "@/components/ui/CreateFolderModal";
-import ViewSwitcher from "@/components/ui/ViewSwitcher";
+import CreateFolderModal from "@/components/ui/modal/CreateFolderModal";
+import ViewSwitcher from "@/components/ui/switcher/ViewSwitcher";
 import FolderItem from "@/components/ui/FolderItem";
 import type { ViewType } from "@/interface/viewSwitch";
 import { TbFolderPlus } from "react-icons/tb";
@@ -62,7 +62,11 @@ export default function Home() {
         <AnimatePresence mode="popLayout">
           {loading ? (
             Array.from({ length: 6 }).map((_, idx) => (
-              <div key={idx} className="skeleton h-20 w-auto" />
+              <div
+                key={idx}
+                className={`skeleton w-auto ${view === "grid" ? "h-27" : "h-15"}`}
+              />
+
             ))
           ) : (
             folders.map((folder) => (

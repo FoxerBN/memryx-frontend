@@ -1,7 +1,5 @@
-// src/layouts/AuthLayout.tsx
 import { Outlet } from "react-router-dom";
-import ThemeSwitcher from "@/components/ui/ThemeSwitcher";
-// ↓ keď si footer dopíšeš, stačí ho importovať:
+import ThemeSwitcher from "@/components/ui/switcher/ThemeSwitcher";
 import Footer from "@/components/layout/Footer";
 
 export default function AuthLayout() {

@@ -1,17 +1,19 @@
 import { useParams, useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { TbFolderHeart } from "react-icons/tb";
-import { PiCardsThree } from "react-icons/pi";
-import { SlOptionsVertical } from "react-icons/sl";
-import { IoArrowBackOutline } from "react-icons/io5";
+import FolderNavigation from "@/components/layout/FolderNavigation";
 import { motion, AnimatePresence } from "motion/react";
+import Notification from "@/components/ui/Notification";
+import { useModalOptions } from "@/utils/modalOptionsUtils";
+import EditDeleteModal from "@/components/ui/modal/EditDeleteModal";
 import {
   containerVariants,
   itemVariants,
   springT,
 } from "@/const/folderAnimation";
-import { base, list as listCard } from "@/const/folderView";
+
 import { testDecks } from "@/const/testDecksList";
+import DeckItem from "@/components/ui/DeckItem";
 
 const mockFolders = [
   { id: 1, name: "English", count: 12 },
@@ -21,11 +23,22 @@ const mockFolders = [
   { id: 5, name: "Geography", count: 5 },
   { id: 6, name: "Programming", count: 15 },
 ];
+const user = { username: "RiskoMiskoHryzko" };
 
 export default function OneFolder() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const [loading, setLoading] = useState<boolean>(true);
+
+  const {
+    optionsOpen,
+    confirmDelete,
+    openOptions,
+    closeOptions,
+    handleEdit,
+    handleDeleteClick,
+    handleConfirmDelete,
+  } = useModalOptions(navigate);
 
   useEffect(() => {
     const timer = setTimeout(() => setLoading(false), 2000);
@@ -36,30 +49,20 @@ export default function OneFolder() {
   const folder = mockFolders.find((f) => f.id === numId) || null;
 
   if (!id) {
-    return (
-      <div className="w-full max-w-5xl mx-auto px-4">
-        <div className="text-center text-lg">Loading...</div>
-      </div>
-    );
+    return <Notification type="loading" />;
   }
 
   if (!folder) {
-    return (
-      <div className="w-full max-w-5xl mx-auto px-4">
-        <div className="text-center text-lg text-error">Folder not found.</div>
-      </div>
-    );
+    return <Notification type="error" message="Folder not found." />;
   }
 
   return (
     <div className="w-full max-w-5xl mx-auto px-4">
-      <button
-        className="btn btn-ghost btn-circle mb-4"
-        onClick={() => navigate(-1)}
-        aria-label="Back"
-      >
-        <IoArrowBackOutline className="text-2xl" />
-      </button>
+      <FolderNavigation
+        onBack={() => navigate(-1)}
+        onAdd={() => {}}
+        username={user?.username ?? "guest"}
+      />
 
       <div className="flex flex-col items-center mb-6">
         <div className="rounded-full p-6 flex items-center justify-center mb-3">
@@ -94,36 +97,26 @@ export default function OneFolder() {
                     whileHover={{ scale: 1.035 }}
                     transition={{ layout: springT }}
                   >
-                    <div className={`${base} ${listCard}`}>
-                      <div className="flex flex-col items-center justify-center w-12 shrink-0 ml-2">
-                        <div className="text-xs font-semibold">
-                          {deck.cardCount}
-                        </div>
-                        <PiCardsThree className="mt-1 rotate-90" size={22} />
-                      </div>
-                      <div className="card-body p-3">
-                        <div className="flex items-center justify-between w-full">
-                          <div className="flex-1 min-w-0">
-                            <div className="font-medium truncate">
-                              {deck.name}
-                            </div>
-                            <div className="text-xs text-base-content/60">
-                              {deck.description}
-                            </div>
-                          </div>
-                          <button
-                            className="btn btn-ghost btn-xs"
-                            aria-label="Deck options"
-                          >
-                            <SlOptionsVertical />
-                          </button>
-                        </div>
-                      </div>
-                    </div>
+                    <DeckItem
+                      name={deck.name}
+                      description={deck.description}
+                      cardCount={deck.cardCount}
+                      onClick={() => navigate(`/deck/${deck.id}`)}
+                      onOptionsClick={() => openOptions(deck.id)}
+                    />
                   </motion.div>
                 ))}
         </AnimatePresence>
       </motion.div>
+
+      <EditDeleteModal
+        open={optionsOpen}
+        onClose={closeOptions}
+        onEdit={handleEdit}
+        onDeleteClick={handleDeleteClick}
+        onConfirmDelete={handleConfirmDelete}
+        confirmDelete={confirmDelete}
+      />
     </div>
   );
 }

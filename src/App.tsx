@@ -8,6 +8,7 @@ import NotFoundPage from "./pages/NotFoundPage";
 import AuthLayout from "./pages/AuthLayout";
 import AppLayout from "./pages/AppLayout";
 import OneFolder from "./pages/app/flashcard/OneFolder";
+import FlashcardSet from "./pages/app/flashcard/FlashcardSet";
 
 function App() {
   return (
@@ -25,6 +26,7 @@ function App() {
             <Route path="/settings" element={<SettingsPage />} />
           </Route>
             <Route path="/folder/:id" element={<OneFolder />} />
+            <Route path="/deck/:id" element={<FlashcardSet />} />
         </Route>
 
         <Route path="*" element={<NotFoundPage />} />

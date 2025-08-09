@@ -1,10 +1,10 @@
-import ThemeSwitcher from "@/components/ui/ThemeSwitcher";
+import ThemeSwitcher from "@/components/ui/switcher/ThemeSwitcher";
 
 type Props = {
   username?: string;
 };
 
-export default function Navigation({ username = "guest" }: Props) {
+export default function Navigation({ username = "RiskoMiskoHryzko" }: Props) {
   return (
     <header className="flex justify-between align-center items-center px-4 py-1">
       <div className="text-sm font-medium text-base-content">{username}</div>
