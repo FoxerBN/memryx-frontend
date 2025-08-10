@@ -1,21 +1,40 @@
-// pages/LoginPage.tsx
-import { useState } from "react";
+import Notification from "@/components/ui/Notification";
+import { useState, useEffect } from "react";
 import { motion } from "motion/react";
 import { Link, useNavigate } from "react-router-dom";
 import UsernameInput from "@/components/ui/form/UsernameInput";
 import { useLoginRegister } from "@/hooks/useLoginRegister";
+import { refresh } from "@/utils/api";
 
 export default function LoginPage() {
   const [username, setUsername] = useState("");
+  const [rememberMe, setRememberMe] = useState(false);
   const { loading, error, login } = useLoginRegister();
+  const [checkingSession, setCheckingSession] = useState(true);
   const navigate = useNavigate();
+
+  useEffect(() => {
+    (async () => {
+      try {
+        await refresh();
+        navigate("/home", { replace: true });
+      } catch {
+        navigate("/login", { replace: true });
+      } finally {
+        setCheckingSession(false);
+      }
+    })();
+  }, [navigate]);
+
+  
+  if (checkingSession) {
+    return <Notification type="loading" />;
+  }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const ok = await login(username);
-    if (ok) {
-      navigate("/home");
-    }
+    const ok = await login(username, rememberMe);
+    if (ok) navigate("/home");
   };
 
   return (
@@ -30,29 +49,24 @@ export default function LoginPage() {
         <UsernameInput value={username} onChange={setUsername} autoFocus />
 
         <label className="flex items-center gap-2 py-2">
-          <input type="checkbox" className="checkbox checkbox-sm" />
+          <input
+            type="checkbox"
+            className="checkbox checkbox-sm"
+            checked={rememberMe}
+            onChange={(e) => setRememberMe(e.target.checked)}
+          />
           <span className="label-text text-sm">Remember me</span>
         </label>
 
-        <button
-          type="submit"
-          className="btn btn-primary w-full"
-          disabled={loading}
-        >
-          {loading ? (
-            <span className="loading loading-dots loading-md" />
-          ) : (
-            "Log in"
-          )}
+        <button type="submit" className="btn btn-primary w-full" disabled={loading}>
+          {loading ? <span className="loading loading-dots loading-md" /> : "Log in"}
         </button>
 
         {error && <p className="text-error text-sm mt-2">{error}</p>}
 
         <p className="text-center text-sm pt-6">
           Don’t have an account?{" "}
-          <Link to="/register" className="link link-primary">
-            Register
-          </Link>
+          <Link to="/register" className="link link-primary">Register</Link>
         </p>
       </motion.form>
     </div>

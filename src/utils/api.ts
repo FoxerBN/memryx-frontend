@@ -1,23 +1,18 @@
 import axios from "axios";
 
-const api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || "http://localhost:3001",
+export const api = axios.create({
+  baseURL: import.meta.env.VITE_API_URL || "http://localhost:8080",
   withCredentials: true,
 });
 
 // ========== API functions ==========
 
-export async function checkAuth() {
-  return api.get("/user/protected");
-}
+export const checkAuth = () => api.get("/api/check");
 
-export const login = ({ username }: { username: string }) =>
-  api.post("/api/auth/login", { username });
+export const login = (payload: { username: string; stayLoggedIn?: boolean }) =>
+  api.post("/api/auth/login", payload);
 
-export const register = ({
-  username,
-  displayName,
-}: {
-  username: string;
-  displayName: string;
-}) => api.post("/api/auth/register", { username, displayName });
+export const register = (payload: { username: string; displayName: string }) =>
+  api.post("/api/auth/register", payload);
+export const refresh = () => api.post("/api/auth/refresh");
+export const logout = () => api.post("/api/auth/logout");

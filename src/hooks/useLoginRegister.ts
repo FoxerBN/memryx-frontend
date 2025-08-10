@@ -1,27 +1,32 @@
 import { useState } from "react";
+import type { AxiosError } from "axios";
 import * as api from "@/utils/api";
 
 export function useLoginRegister() {
   const [loading, setLoading] = useState(false);
-  const [error,  setError]   = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
 
-  const valid = (s: string) =>
-    /^[A-Za-z][A-Za-z0-9]{2,29}$/.test(s);
+  const valid = (s: string) => /^[A-Za-z][A-Za-z0-9]{2,29}$/.test(s);
 
-  const login = async (username: string) => {
+  const login = async (username: string, stayLoggedIn = false) => {
     if (!valid(username)) {
       setError("Invalid username format.");
       return false;
     }
 
     setLoading(true);
+    setError(null);
     try {
-      await api.login({ username });
+      await api.login({ username, stayLoggedIn });
       return true;
-    } catch (e: unknown) {
-      const message =
-          e instanceof Error ? e.message : "Unexpected error";
-        setError(message);
+    } catch (e) {
+      const ax = e as AxiosError<{ error?: string; message?: string }>;
+      const msg =
+        ax.response?.data?.error ??
+        ax.response?.data?.message ??
+        ax.message ??
+        "Unexpected error";
+      setError(msg);
       return false;
     } finally {
       setLoading(false);
@@ -35,13 +40,18 @@ export function useLoginRegister() {
     }
 
     setLoading(true);
+    setError(null);
     try {
       await api.register({ username, displayName });
       return true;
     } catch (e: unknown) {
-      const message =
-          e instanceof Error ? e.message : "Unexpected error";
-        setError(message);
+      const ax = e as AxiosError<{ error?: string; message?: string}>;
+      const msg =
+        ax?.response?.data?.error ??
+        ax?.response?.data?.message ??
+        ax?.message ??
+        "Unexpected error";
+      setError(msg);
       return false;
     } finally {
       setLoading(false);
