@@ -1,10 +1,11 @@
 import { useState } from "react";
 import type { AxiosError } from "axios";
 import * as api from "@/utils/api";
+import { setUser } from "@/utils/authStorage";
 
 export function useLoginRegister() {
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [error,   setError]   = useState<string | null>(null);
 
   const valid = (s: string) => /^[A-Za-z][A-Za-z0-9]{2,29}$/.test(s);
 
@@ -13,25 +14,27 @@ export function useLoginRegister() {
       setError("Invalid username format.");
       return false;
     }
-
     setLoading(true);
     setError(null);
     try {
-      await api.login({ username, stayLoggedIn });
+      const { data } = await api.login({ username, stayLoggedIn });
+      const profile = await api.getUser(data.userId);
+      setUser({
+        userId: profile.data.id,
+        username: profile.data.username,
+        displayName: profile.data.displayName,
+      });
       return true;
     } catch (e) {
       const ax = e as AxiosError<{ error?: string; message?: string }>;
-      const msg =
-        ax.response?.data?.error ??
-        ax.response?.data?.message ??
-        ax.message ??
-        "Unexpected error";
+      const msg = ax.response?.data?.error ?? ax.response?.data?.message ?? ax.message ?? "Unexpected error";
       setError(msg);
       return false;
     } finally {
       setLoading(false);
     }
   };
+
 
   const register = async (username: string, displayName: string) => {
     if (!valid(username) || !valid(displayName)) {

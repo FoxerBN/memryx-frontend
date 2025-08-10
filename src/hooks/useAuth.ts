@@ -1,7 +1,6 @@
-// useAuth.ts
 import { useEffect, useState } from "react";
-import axios from "axios";
 import type { AuthState } from "@/interface/authState";
+import { checkAuth } from "@/utils/api";
 
 export function useAuth(): AuthState {
   const [auth, setAuth] = useState<AuthState>({ loading: true, isAuthenticated: false });
@@ -9,7 +8,7 @@ export function useAuth(): AuthState {
   useEffect(() => {
     (async () => {
       try {
-        await axios.get(`${import.meta.env.VITE_API_URL}/api/check`, { withCredentials: true });
+        await checkAuth();
         setAuth({ loading: false, isAuthenticated: true });
       } catch {
         setAuth({ loading: false, isAuthenticated: false });

@@ -4,7 +4,8 @@ import { motion } from "motion/react";
 import { Link, useNavigate } from "react-router-dom";
 import UsernameInput from "@/components/ui/form/UsernameInput";
 import { useLoginRegister } from "@/hooks/useLoginRegister";
-import { refresh } from "@/utils/api";
+import { refresh, getUser } from "@/utils/api";
+import { setUser } from "@/utils/authStorage";
 
 export default function LoginPage() {
   const [username, setUsername] = useState("");
@@ -13,20 +14,25 @@ export default function LoginPage() {
   const [checkingSession, setCheckingSession] = useState(true);
   const navigate = useNavigate();
 
-  useEffect(() => {
+ useEffect(() => {
     (async () => {
       try {
-        await refresh();
+        const { data } = await refresh();
+        const profile = await getUser(data.userId);
+        setUser({
+          userId: profile.data.id,
+          username: profile.data.username,
+          displayName: profile.data.displayName,
+        });
         navigate("/home", { replace: true });
       } catch {
-        navigate("/login", { replace: true });
+        console.error("Session check failed, user not logged in.");
       } finally {
         setCheckingSession(false);
       }
     })();
   }, [navigate]);
 
-  
   if (checkingSession) {
     return <Notification type="loading" />;
   }

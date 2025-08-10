@@ -1,7 +1,9 @@
+import { logout } from "@/utils/api";
+
 export default function Settings() {
   return (
     <div>
-      <h1>Settings Page</h1>
+      <button onClick={logout} className="btn btn-error">Logout</button>
     </div>
   );
 }
