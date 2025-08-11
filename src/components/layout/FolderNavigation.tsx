@@ -1,11 +1,6 @@
 import { IoArrowBackOutline } from "react-icons/io5";
 import { FaPlus } from "react-icons/fa6";
-
-type FolderNavigationProps = {
-  onBack: () => void;
-  onAdd: () => void;
-  username?: string;
-};
+import type { FolderNavigationProps } from "@/type/folderNavigationProps";
 
 const FolderNavigation = ({ onBack, onAdd, username = "guest" }: FolderNavigationProps) => (
   <div className="flex items-center justify-between w-full pt-3.5  px-4 py-1">

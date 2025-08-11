@@ -1,12 +1,8 @@
-// DisplayNameInput.tsx
+import type { DisplaynameInputProps } from "@/type/localstorage/authInputProps";
+
 import { BsCardText } from "react-icons/bs";
 
-type Props = {
-  value: string;
-  onChange: (v: string) => void;
-};
-
-export default function DisplayNameInput({ value, onChange }: Props) {
+export default function DisplayNameInput({ value, onChange }: DisplaynameInputProps) {
   return (
     <>
       <label className="input validator">

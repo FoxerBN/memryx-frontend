@@ -1,13 +1,8 @@
-// UsernameInput.tsx
+import type { UsernameInputProps } from '@/type/localstorage/authInputProps';
 import { BsPersonCircle } from "react-icons/bs";
 
-type Props = {
-  value: string;
-  onChange: (v: string) => void;
-  autoFocus?: boolean;
-};
 
-export default function UsernameInput({ value, onChange, autoFocus }: Props) {
+export default function UsernameInput({ value, onChange, autoFocus }: UsernameInputProps) {
   return (
     <>
       <label className="input validator">

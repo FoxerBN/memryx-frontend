@@ -32,10 +32,13 @@ export type FolderSummary = {
   name: string;
   deckCount: number;
 };
+export type FolderDto = {
+  id: number;
+  name: string;
+};
 
 export const getFolderSummaries = (userId: number) =>
   api.get<FolderSummary[]>(`/api/folders/user/${userId}/summary`);
 
-export const createFolder = async (payload: { userId: number; name: string }) => {
-  return api.post<{ id: number }>(`/api/folders/`, payload);
-};
+export const createFolder = (userId: number, payload: { name: string }) =>
+  api.post(`/api/folders/user/${userId}`, payload);

@@ -2,9 +2,7 @@ import type { NavigateFunction } from "react-router-dom";
 import type { Dispatch, SetStateAction } from "react";
 import { useState } from "react";
 
-export function useModalOptions(
-  navigate: NavigateFunction
-): {
+export function useModalOptions(navigate: NavigateFunction): {
   optionsOpen: boolean;
   setOptionsOpen: Dispatch<SetStateAction<boolean>>;
   confirmDelete: boolean;
@@ -41,7 +39,7 @@ export function useModalOptions(
   };
 
   const handleDeleteClick = () => {
-    setConfirmDelete(true);
+    setConfirmDelete((prev) => !prev);
   };
 
   const handleConfirmDelete = () => {
@@ -63,4 +61,3 @@ export function useModalOptions(
     handleConfirmDelete,
   };
 }
-

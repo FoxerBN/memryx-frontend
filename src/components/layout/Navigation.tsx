@@ -1,10 +1,11 @@
 import ThemeSwitcher from "@/components/ui/switcher/ThemeSwitcher";
 import { getUser } from "@/utils/authStorage";
-type Props = {
+
+type DisplayNameProps = {
   username?: string;
 };
 
-export default function Navigation({ username = "guest" }: Props) {
+export default function Navigation({ username = "guest" }: DisplayNameProps) {
   const storedUser = getUser();
   if (storedUser) {
     username = storedUser.displayName;

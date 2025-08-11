@@ -1,4 +1,4 @@
-// pages/Home.tsx (zmenené časti)
+// pages/Home.tsx
 import { useState } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import { Link } from "react-router-dom";
@@ -19,9 +19,10 @@ export default function Home() {
 
   const handleCreateFolder = async (name: string) => {
     await create(name);
+    setIsModalOpen(false);
   };
 
-  if(folders.length == 0)return  <Notification type="info" message="You have no folders yet."/>
+  const isEmpty = !loading && folders.length === 0;
 
   return (
     <div className="w-full max-w-5xl mx-auto px-4">
@@ -32,61 +33,78 @@ export default function Home() {
           size={25}
           className="cursor-pointer"
           onClick={() => setIsModalOpen(true)}
+          title="Create folder"
+          aria-label="Create folder"
         />
       </div>
 
-      {/* Voliteľne error */}
+      {/* Error (keeps toolbar visible) */}
       {error && (
         <div className="alert alert-error mb-4">
           <span>{error}</span>
         </div>
       )}
 
-      {/* Folder list */}
-      <motion.div
-        layout
-        variants={containerVariants}
-        initial="hidden"
-        animate="visible"
-        transition={{ layout: springT }} 
-        className={
-          view === "grid"
-            ? "grid grid-cols-2 pb-20 md:grid-cols-3 gap-4"
-            : "flex flex-col pb-20 space-y-3"
-        }
-      >
-        <AnimatePresence mode="popLayout">
-          {loading ? (
-            Array.from({ length: 6 }).map((_, idx) => (
-              <div
-                key={idx}
-                className={`skeleton w-auto ${view === "grid" ? "h-27" : "h-15"}`}
-              />
-            ))
-          ) : (
-            folders.map((folder) => (
-              <motion.div
-                key={folder.id}
-                layout
-                variants={itemVariants}
-                initial="hidden"
-                animate="visible"
-                exit="exit"
-                whileHover={{ scale: 1.035 }}
-                transition={{ layout: springT }}
-              >
-                <Link to={`/folder/${folder.id}`}>
-                  <FolderItem
-                    name={folder.name}
-                    count={folder.deckCount}
-                    view={view}
+      {/* Empty state (keeps toolbar visible) */}
+      {isEmpty && (
+        <div className="flex flex-col items-center justify-center gap-4 py-14">
+          <Notification type="info" message="You have no folders yet." />
+          <button
+            className="btn btn-primary"
+            onClick={() => setIsModalOpen(true)}
+          >
+            Create your first folder
+          </button>
+        </div>
+      )}
+
+      {/* Folder list / Loading */}
+      {!isEmpty && (
+        <motion.div
+          layout
+          variants={containerVariants}
+          initial="hidden"
+          animate="visible"
+          transition={{ layout: springT }}
+          className={
+            view === "grid"
+              ? "grid grid-cols-2 pb-20 md:grid-cols-3 gap-4"
+              : "flex flex-col pb-20 space-y-3"
+          }
+        >
+          <AnimatePresence mode="popLayout">
+            {loading
+              ? Array.from({ length: 10 }).map((_, idx) => (
+                  <div
+                    key={idx}
+                    className={`skeleton w-auto ${
+                      view === "grid" ? "h-27" : "h-15"
+                    }`}
                   />
-                </Link>
-              </motion.div>
-            ))
-          )}
-        </AnimatePresence>
-      </motion.div>
+                ))
+              : folders.map((folder) => (
+                  <motion.div
+                    key={folder.id}
+                    layout
+                    variants={itemVariants}
+                    initial="hidden"
+                    animate="visible"
+                    exit="exit"
+                    whileHover={{ scale: 1.035 }}
+                    transition={{ layout: springT }}
+                  >
+                    <Link to={`/folder/${folder.id}`}>
+                      <FolderItem
+                        name={folder.name}
+                        count={folder.deckCount}
+                        view={view}
+                      />
+                    </Link>
+                  </motion.div>
+                ))}
+          </AnimatePresence>
+        </motion.div>
+      )}
 
       {/* Modal */}
       <CreateFolderModal

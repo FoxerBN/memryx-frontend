@@ -2,6 +2,7 @@ import { useState } from "react";
 import type { AxiosError } from "axios";
 import * as api from "@/utils/api";
 import { setUser } from "@/utils/authStorage";
+import type { CustomAxiosError } from "@/type/axiosError";
 
 export function useLoginRegister() {
   const [loading, setLoading] = useState(false);
@@ -26,7 +27,7 @@ export function useLoginRegister() {
       });
       return true;
     } catch (e) {
-      const ax = e as AxiosError<{ error?: string; message?: string }>;
+      const ax = e as AxiosError<CustomAxiosError>;
       const msg = ax.response?.data?.error ?? ax.response?.data?.message ?? ax.message ?? "Unexpected error";
       setError(msg);
       return false;
@@ -48,7 +49,7 @@ export function useLoginRegister() {
       await api.register({ username, displayName });
       return true;
     } catch (e: unknown) {
-      const ax = e as AxiosError<{ error?: string; message?: string}>;
+      const ax = e as AxiosError<CustomAxiosError>;
       const msg =
         ax?.response?.data?.error ??
         ax?.response?.data?.message ??
