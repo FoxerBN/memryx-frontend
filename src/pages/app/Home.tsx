@@ -2,24 +2,41 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import { Link } from "react-router-dom";
+import { TbFolderPlus } from "react-icons/tb";
+
 import CreateFolderModal from "@/components/ui/modal/CreateFolderModal";
+import FolderEditModal from "@/components/ui/modal/FolderEditModal"; // uprav cestu, ak sa líši
 import ViewSwitcher from "@/components/ui/switcher/ViewSwitcher";
 import FolderItem from "@/components/ui/FolderItem";
+import Notification from "@/components/ui/Notification";
+
 import type { ViewType } from "@/interface/viewSwitch";
-import { TbFolderPlus } from "react-icons/tb";
+import type { FolderSummary } from "@/type/folderApi";
 import { containerVariants, springT, itemVariants } from "@/const/folderAnimation";
 import { useFolder } from "@/hooks/useFolder";
-import Notification from "@/components/ui/Notification";
 
 export default function Home() {
   const [view, setView] = useState<ViewType>("grid");
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isCreateOpen, setIsCreateOpen] = useState(false);
 
-  const { folders, loading, error, create } = useFolder();
+  const { folders, loading, error, create, rename, remove } = useFolder();
+
+  // Options modal (Edit/Delete)
+  const [optsOpen, setOptsOpen] = useState(false);
+  const [selected, setSelected] = useState<FolderSummary | null>(null);
+
+  const openOptions = (folder: FolderSummary) => {
+    setSelected(folder);
+    setOptsOpen(true);
+  };
+  const closeOptions = () => {
+    setOptsOpen(false);
+    setSelected(null);
+  };
 
   const handleCreateFolder = async (name: string) => {
     await create(name);
-    setIsModalOpen(false);
+    setIsCreateOpen(false);
   };
 
   const isEmpty = !loading && folders.length === 0;
@@ -32,33 +49,30 @@ export default function Home() {
         <TbFolderPlus
           size={25}
           className="cursor-pointer"
-          onClick={() => setIsModalOpen(true)}
+          onClick={() => setIsCreateOpen(true)}
           title="Create folder"
           aria-label="Create folder"
         />
       </div>
 
-      {/* Error (keeps toolbar visible) */}
+      {/* Error (neblokuje UI) */}
       {error && (
         <div className="alert alert-error mb-4">
           <span>{error}</span>
         </div>
       )}
 
-      {/* Empty state (keeps toolbar visible) */}
+      {/* Empty state */}
       {isEmpty && (
         <div className="flex flex-col items-center justify-center gap-4 py-14">
           <Notification type="info" message="You have no folders yet." />
-          <button
-            className="btn btn-primary"
-            onClick={() => setIsModalOpen(true)}
-          >
+          <button className="btn btn-primary" onClick={() => setIsCreateOpen(true)}>
             Create your first folder
           </button>
         </div>
       )}
 
-      {/* Folder list / Loading */}
+      {/* Zoznam / Loading */}
       {!isEmpty && (
         <motion.div
           layout
@@ -73,13 +87,11 @@ export default function Home() {
           }
         >
           <AnimatePresence mode="popLayout">
-            {loading
+            {loading && folders.length === 0
               ? Array.from({ length: 10 }).map((_, idx) => (
                   <div
                     key={idx}
-                    className={`skeleton w-auto ${
-                      view === "grid" ? "h-27" : "h-15"
-                    }`}
+                    className={`skeleton w-auto ${view === "grid" ? "h-27" : "h-15"}`}
                   />
                 ))
               : folders.map((folder) => (
@@ -98,6 +110,7 @@ export default function Home() {
                         name={folder.name}
                         count={folder.deckCount}
                         view={view}
+                        onOptionsClick={() => openOptions(folder)} // tri bodky sú priamo v FolderItem
                       />
                     </Link>
                   </motion.div>
@@ -106,11 +119,21 @@ export default function Home() {
         </motion.div>
       )}
 
-      {/* Modal */}
+      {/* Create modal */}
       <CreateFolderModal
-        open={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
+        open={isCreateOpen}
+        onClose={() => setIsCreateOpen(false)}
         onCreate={handleCreateFolder}
+      />
+
+      {/* Options modal (Edit/Delete) */}
+      <FolderEditModal
+        open={optsOpen}
+        onClose={closeOptions}
+        folderId={selected?.id ?? 0}
+        initialName={selected?.name ?? ""}
+        onRename={(id, name) => rename(id, name)}
+        onDelete={(id) => remove(id)}
       />
     </div>
   );

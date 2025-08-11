@@ -3,4 +3,5 @@ export interface FolderItemProps {
   name: string;
   view: ViewType;
   count: number;
+  onOptionsClick?: () => void;
 }

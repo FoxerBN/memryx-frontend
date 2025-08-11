@@ -1,34 +1,46 @@
+// pages/OneFolder.tsx
 import { useParams, useNavigate } from "react-router-dom";
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
+import type { AxiosResponse } from "axios";
 import { TbFolderHeart } from "react-icons/tb";
 import FolderNavigation from "@/components/layout/FolderNavigation";
 import { motion, AnimatePresence } from "motion/react";
 import Notification from "@/components/ui/Notification";
-import { useModalOptions } from "@/utils/modalOptionsUtils";
 import EditDeleteModal from "@/components/ui/modal/EditDeleteModal";
-import {
-  containerVariants,
-  itemVariants,
-  springT,
-} from "@/const/folderAnimation";
-
-import { testDecks } from "@/const/testDecksList";
+import { useModalOptions } from "@/utils/modalOptionsUtils";
+import { containerVariants, itemVariants, springT } from "@/const/folderAnimation";
 import DeckItem from "@/components/ui/DeckItem";
-
-const mockFolders = [
-  { id: 1, name: "English", count: 12 },
-  { id: 2, name: "Mathematics", count: 7 },
-  { id: 3, name: "Science", count: 9 },
-  { id: 4, name: "History", count: 4 },
-  { id: 5, name: "Geography", count: 5 },
-  { id: 6, name: "Programming", count: 15 },
-];
-const user = { username: "RiskoMiskoHryzko" };
+import { useDecks } from "@/hooks/useDeck";
+import { getFolder } from "@/utils/api";
+import type { DeckSummary } from "@/type/deckApi";
+import type { FolderDto } from "@/type/folderApi";
+import { getUser as getStoredUser } from "@/utils/authStorage";
+import { loadFolders } from "@/utils/folderStorage";
 
 export default function OneFolder() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const [loading, setLoading] = useState<boolean>(true);
+  const folderId = id ? Number(id) : NaN;
+
+  // 1) predvyplň názov z cache (ak existuje)
+  const userId = getStoredUser()?.userId ?? null;
+  const cachedName =
+    userId != null
+      ? loadFolders(userId)?.folders.find((f) => f.id === folderId)?.name ?? ""
+      : "";
+
+  const [folderName, setFolderName] = useState<string>(cachedName);
+
+  const { decks, loading, error } = useDecks(Number.isNaN(folderId) ? null : folderId);
+
+  useEffect(() => {
+    if (Number.isNaN(folderId)) return;
+    getFolder(folderId)
+      .then((r: AxiosResponse<FolderDto>) => setFolderName(r.data?.name ?? cachedName))
+      .catch(() => {
+      });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [folderId, userId]);
 
   const {
     optionsOpen,
@@ -40,53 +52,56 @@ export default function OneFolder() {
     handleConfirmDelete,
   } = useModalOptions(navigate);
 
-  useEffect(() => {
-    const timer = setTimeout(() => setLoading(false), 2000);
-    return () => clearTimeout(timer);
-  }, []);
-
-  const numId = id ? parseInt(id, 10) : NaN;
-  const folder = mockFolders.find((f) => f.id === numId) || null;
-
-  if (!id) {
-    return <Notification type="loading" />;
+  if (!id || Number.isNaN(folderId)) {
+    return <Notification type="error" message="Invalid folder id." />;
   }
 
-  if (!folder) {
-    return <Notification type="error" message="Folder not found." />;
-  }
+  const isEmpty = !loading && !error && decks.length === 0;
 
   return (
     <div className="w-full max-w-5xl mx-auto px-4">
       <FolderNavigation
         onBack={() => navigate(-1)}
         onAdd={() => {}}
-        username={user?.username ?? "guest"}
+        username={"guest"}
       />
 
       <div className="flex flex-col items-center mb-6">
         <div className="rounded-full p-6 flex items-center justify-center mb-3">
           <TbFolderHeart className="text-5xl" />
         </div>
-        <h1 className="text-2xl font-bold text-center mb-1">{folder.name}</h1>
+        <h1 className="text-2xl font-bold text-center mb-1">
+          {folderName || `Folder #${folderId}`}
+        </h1>
       </div>
 
-      <motion.div
-        layout
-        variants={containerVariants}
-        initial="hidden"
-        animate="visible"
-        transition={{ layout: springT }}
-        className="flex flex-col pb-20 space-y-3"
-      >
-        <AnimatePresence mode="popLayout">
-          {loading
-            ? Array.from({ length: 6 }).map((_, idx) => (
-                <div key={idx} className="skeleton h-20 w-auto" />
-              ))
-            : testDecks
-                .filter((deck) => deck.folderId === numId)
-                .map((deck) => (
+      {error && (
+        <div className="alert alert-error mb-4">
+          <span>{error}</span>
+        </div>
+      )}
+
+      {isEmpty && (
+        <div className="flex flex-col items-center gap-4 py-14">
+          <Notification type="info" message="This folder has no decks yet." />
+        </div>
+      )}
+
+      {!isEmpty && (
+        <motion.div
+          layout
+          variants={containerVariants}
+          initial="hidden"
+          animate="visible"
+          transition={{ layout: springT }}
+          className="flex flex-col pb-20 space-y-3"
+        >
+          <AnimatePresence mode="popLayout">
+            {loading
+              ? Array.from({ length: 6 }).map((_, idx) => (
+                  <div key={idx} className="skeleton h-20 w-auto" />
+                ))
+              : decks.map((deck: DeckSummary) => (
                   <motion.div
                     key={deck.id}
                     layout
@@ -100,14 +115,15 @@ export default function OneFolder() {
                     <DeckItem
                       name={deck.name}
                       description={deck.description}
-                      cardCount={deck.cardCount}
+                      cardCount={deck.flashcardCount}
                       onClick={() => navigate(`/deck/${deck.id}`)}
                       onOptionsClick={() => openOptions(deck.id)}
                     />
                   </motion.div>
                 ))}
-        </AnimatePresence>
-      </motion.div>
+          </AnimatePresence>
+        </motion.div>
+      )}
 
       <EditDeleteModal
         open={optionsOpen}

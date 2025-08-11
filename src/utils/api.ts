@@ -1,5 +1,8 @@
 import axios from "axios";
 import type { AppUser } from "@/interface/appUser";
+import type { DeckSummary } from "@/type/deckApi";
+import type { FolderDto, FolderSummary } from "@/type/folderApi";
+
 export const api = axios.create({
   baseURL: import.meta.env.VITE_API_URL || "http://localhost:8080",
   withCredentials: true,
@@ -16,7 +19,6 @@ export const register = (payload: { username: string; displayName: string }) =>
   api.post("/api/user/create", payload);
 
 export const refresh = () => api.post("/api/auth/refresh");
-
 export const logout = () => api.post("/api/auth/logout");
 
 // ========== USER API functions ==========
@@ -27,18 +29,21 @@ export const getUser = (id: number) => api.get<AppUser>(`/api/user/${id}`);
 
 export type AuthEnvelope = { userId: number; username: string; message?: string };
 
-export type FolderSummary = {
-  id: number;
-  name: string;
-  deckCount: number;
-};
-export type FolderDto = {
-  id: number;
-  name: string;
-};
-
 export const getFolderSummaries = (userId: number) =>
   api.get<FolderSummary[]>(`/api/folders/user/${userId}/summary`);
 
 export const createFolder = (userId: number, payload: { name: string }) =>
-  api.post(`/api/folders/user/${userId}`, payload);
+  api.post<FolderDto>(`/api/folders/user/${userId}`, payload);
+
+export const getFolder = (id: number) => api.get<FolderDto>(`/api/folders/${id}`);
+
+export const updateFolder = (id: number, payload: { name: string }) =>
+  api.put<FolderDto>(`/api/folders/${id}`, payload);
+
+export const deleteFolder = (id: number) =>
+  api.delete<{ message: string }>(`/api/folders/${id}`);
+
+// ========== DECK API functions ==========
+
+export const getDeckSummariesByFolder = (folderId: number) =>
+  api.get<DeckSummary[]>(`/api/decks/folder/${folderId}/summary`);
