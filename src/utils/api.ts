@@ -1,6 +1,6 @@
 import axios from "axios";
 import type { AppUser } from "@/interface/appUser";
-import type { DeckSummary } from "@/type/deckApi";
+import type { DeckSummary, DeckDto, DeckCreateRequestDto } from "@/type/deckApi";
 import type { FolderDto, FolderSummary } from "@/type/folderApi";
 
 export const api = axios.create({
@@ -47,3 +47,17 @@ export const deleteFolder = (id: number) =>
 
 export const getDeckSummariesByFolder = (folderId: number) =>
   api.get<DeckSummary[]>(`/api/decks/folder/${folderId}/summary`);
+
+export const createDeck = (payload: DeckCreateRequestDto) =>
+  api.post<DeckDto>("/api/decks", payload);
+
+export const getDeck = (id: number) =>
+  api.get<DeckDto>(`/api/decks/${id}`);
+
+export const updateDeck = (id: number, payload: Partial<DeckCreateRequestDto>) =>
+  api.put<DeckDto>(`/api/decks/${id}`, payload);
+
+export const deleteDeck = (id: number) =>
+  api.delete<{ message: string }>(`/api/decks/${id}`);
+
+

@@ -26,7 +26,7 @@ export function saveFolders(userId: number, folders: FolderSummary[]) {
   try {
     localStorage.setItem(keyFor(userId), JSON.stringify(data));
   } catch {
-    // storage full or disabled – swallow
+    console.error("Failed to save folders to localStorage");
   }
 }
 

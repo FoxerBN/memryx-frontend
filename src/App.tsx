@@ -9,6 +9,8 @@ import AuthLayout from "./pages/AuthLayout";
 import AppLayout from "./pages/AppLayout";
 import OneFolder from "./pages/app/flashcard/OneFolder";
 import FlashcardSet from "./pages/app/flashcard/FlashcardSet";
+import CreateDeck from "./pages/app/flashcard/CreateDeck";
+import EditDeck from "./pages/app/flashcard/EditDeck";
 
 function App() {
   return (
@@ -26,7 +28,9 @@ function App() {
             <Route path="/settings" element={<SettingsPage />} />
           </Route>
             <Route path="/folder/:id" element={<OneFolder />} />
+            <Route path="/folder/:folderId/create-deck" element={<CreateDeck />} />
             <Route path="/deck/:id" element={<FlashcardSet />} />
+            <Route path="/deck/:deckId/edit" element={<EditDeck />} />
         </Route>
 
         <Route path="*" element={<NotFoundPage />} />

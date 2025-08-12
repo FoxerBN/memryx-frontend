@@ -21,7 +21,6 @@ export default function Home() {
 
   const { folders, loading, error, create, rename, remove } = useFolder();
 
-  // Options modal (Edit/Delete)
   const [optsOpen, setOptsOpen] = useState(false);
   const [selected, setSelected] = useState<FolderSummary | null>(null);
 

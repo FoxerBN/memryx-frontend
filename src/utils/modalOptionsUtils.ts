@@ -33,7 +33,7 @@ export function useModalOptions(navigate: NavigateFunction): {
 
   const handleEdit = () => {
     if (selectedDeckId != null) {
-      navigate(`/deck/edit/${selectedDeckId}`);
+      navigate(`/deck/${selectedDeckId}/edit`);
     }
     closeOptions();
   };

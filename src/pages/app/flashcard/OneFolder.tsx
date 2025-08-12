@@ -31,7 +31,7 @@ export default function OneFolder() {
 
   const [folderName, setFolderName] = useState<string>(cachedName);
 
-  const { decks, loading, error } = useDecks(Number.isNaN(folderId) ? null : folderId);
+  const { decks, loading, error, remove } = useDecks(Number.isNaN(folderId) ? null : folderId);
 
   useEffect(() => {
     if (Number.isNaN(folderId)) return;
@@ -45,12 +45,20 @@ export default function OneFolder() {
   const {
     optionsOpen,
     confirmDelete,
+    selectedDeckId,
     openOptions,
     closeOptions,
     handleEdit,
     handleDeleteClick,
-    handleConfirmDelete,
+    handleConfirmDelete: originalHandleConfirmDelete,
   } = useModalOptions(navigate);
+
+  const handleConfirmDelete = async () => {
+    if (selectedDeckId != null) {
+      await remove(selectedDeckId);
+    }
+    originalHandleConfirmDelete();
+  };
 
   if (!id || Number.isNaN(folderId)) {
     return <Notification type="error" message="Invalid folder id." />;
@@ -61,8 +69,8 @@ export default function OneFolder() {
   return (
     <div className="w-full max-w-5xl mx-auto px-4">
       <FolderNavigation
-        onBack={() => navigate(-1)}
-        onAdd={() => {}}
+        onBack={() => navigate("/home")}
+        onAdd={() => navigate(`/folder/${folderId}/create-deck`)}
         username={"guest"}
       />
 
@@ -84,6 +92,11 @@ export default function OneFolder() {
       {isEmpty && (
         <div className="flex flex-col items-center gap-4 py-14">
           <Notification type="info" message="This folder has no decks yet." />
+          <button
+            className="btn btn-primary"
+            onClick={() => navigate(`/folder/${folderId}/create-deck`)}>
+            Create your first deck
+          </button>
         </div>
       )}
 
