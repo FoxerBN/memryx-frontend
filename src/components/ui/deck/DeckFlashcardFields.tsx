@@ -13,9 +13,13 @@ const DeckFlashcardFields: React.FC<FlashcardFieldProps> = ({
   autoFocus,
 }) => {
   const firstInputRef = useRef<HTMLInputElement>(null);
+  const hasFocused = useRef(false);
 
   useEffect(() => {
-    if (autoFocus) firstInputRef.current?.focus();
+    if (autoFocus && !hasFocused.current) {
+      firstInputRef.current?.focus();
+      hasFocused.current = true;
+    }
   }, [autoFocus]);
 
   return (

@@ -18,14 +18,14 @@ export function useDeckForm({
 
   const addFlashcard = useCallback(() => {
     setFlashcards(prev => [...prev, { frontText: '', backText: '' }]);
-  
+    const delay = 350;
     setTimeout(() => {
-      window.scrollTo({
-        top: document.body.scrollHeight,
-        behavior: 'smooth'
-      });
-    }, 300);
+      const el = document.scrollingElement || document.documentElement || document.body;
+      const bottom = el.scrollHeight;
+      window.scrollTo({ top: bottom, behavior: 'smooth' });
+    }, delay);
   }, []);
+
 
   const removeFlashcard = useCallback((index: number) => {
     setFlashcards(prev => prev.length > 1 ? prev.filter((_, i) => i !== index) : prev);
@@ -72,7 +72,7 @@ export function useDeckForm({
     error,
     setDeckName,
     setDescription,
-    setFlashcards, // expose for edit initialization
+    setFlashcards,
     addFlashcard,
     removeFlashcard,
     updateFlashcard,

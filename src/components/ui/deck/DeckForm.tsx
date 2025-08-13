@@ -1,10 +1,8 @@
-import React, { useMemo} from 'react';
+import React, { useMemo } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { easeOut } from 'motion';
 import DeckFlashcardFields from './DeckFlashcardFields';
 import type { DeckFormProps } from '@/interface/deckFormProps';
-
-
 
 const fadeInUp = {
   initial: { opacity: 0, y: 8 },
@@ -29,10 +27,8 @@ const DeckForm: React.FC<DeckFormProps> = ({
   onSubmit,
   submitLabel,
 }) => {
-
-
-  // Memo for keying last index for autofocus
   const lastIndex = useMemo(() => Math.max(0, flashcards.length - 1), [flashcards.length]);
+
 
   return (
     <motion.form onSubmit={onSubmit} className="space-y-6 relative" {...fadeInUp}>
@@ -100,7 +96,7 @@ const DeckForm: React.FC<DeckFormProps> = ({
           <motion.div layout className="space-y-4">
             {flashcards.map((card, idx) => (
               <motion.div
-                key={`${idx}-${card.frontText?.slice(0, 2) ?? ''}-${card.backText?.slice(0, 2) ?? ''}`}
+                key={idx}
                 layout
                 initial={{ opacity: 0, y: 8, scale: 0.98 }}
                 animate={{ opacity: 1, y: 0, scale: 1 }}
@@ -119,10 +115,9 @@ const DeckForm: React.FC<DeckFormProps> = ({
                 />
               </motion.div>
             ))}
-            <div />
           </motion.div>
         </AnimatePresence>
-      </div>
+      </div >
 
       <motion.button
         type="submit"
