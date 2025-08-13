@@ -1,17 +1,8 @@
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
+import { motion } from 'motion/react';
+import type { FlashcardFieldProps } from '@/interface/flashcardFieldProps';
 
-export interface FlashcardFieldProps {
-  index: number;
-  frontText: string;
-  backText: string;
-  disabled?: boolean;
-  onChange: (index: number, field: 'frontText' | 'backText', value: string) => void;
-  onRemove?: (index: number) => void;
-  canRemove: boolean;
-}
-
-// Single flashcard input group
-export const DeckFlashcardFields: React.FC<FlashcardFieldProps> = ({
+const DeckFlashcardFields: React.FC<FlashcardFieldProps> = ({
   index,
   frontText,
   backText,
@@ -19,41 +10,53 @@ export const DeckFlashcardFields: React.FC<FlashcardFieldProps> = ({
   onChange,
   onRemove,
   canRemove,
-}) => (
-  <div className="card bg-base-200 p-4">
-    <div className="flex justify-between items-center mb-3">
-      <span className="font-medium">Flashcard {index + 1}</span>
-      {canRemove && onRemove && (
-        <button
-          type="button"
-          className="btn btn-sm btn-error"
-          onClick={() => onRemove(index)}
-          disabled={disabled}
-        >
-          Remove
-        </button>
-      )}
-    </div>
+  autoFocus,
+}) => {
+  const firstInputRef = useRef<HTMLInputElement>(null);
 
-    <div className="space-y-3">
-      <input
-        type="text"
-        className="input input-bordered w-full"
-        placeholder="Front Text"
-        value={frontText}
-        onChange={(e) => onChange(index, 'frontText', e.target.value)}
-        disabled={disabled}
-      />
-      <input
-        type="text"
-        className="input input-bordered w-full"
-        placeholder="Back Text"
-        value={backText}
-        onChange={(e) => onChange(index, 'backText', e.target.value)}
-        disabled={disabled}
-      />
+  useEffect(() => {
+    if (autoFocus) firstInputRef.current?.focus();
+  }, [autoFocus]);
+
+  return (
+    <div className="card bg-base-200/60 backdrop-blur border border-base-300/50 shadow-sm hover:shadow-md transition-all duration-200">
+      <div className="flex justify-between items-center gap-4 p-4 pb-2">
+        <span className="font-medium">Flashcard {index + 1}</span>
+        {canRemove && onRemove && (
+          <motion.button
+            type="button"
+            className="btn btn-sm btn-error"
+            onClick={() => onRemove(index)}
+            disabled={disabled}
+            whileHover={{ scale: 1.03 }}
+            whileTap={{ scale: 0.97 }}
+          >
+            Remove
+          </motion.button>
+        )}
+      </div>
+
+      <div className="p-4 pt-2 space-y-3">
+        <input
+          ref={firstInputRef}
+          type="text"
+          className="input input-bordered w-full focus:outline-none focus:ring focus:ring-primary/25"
+          placeholder="Front Text"
+          value={frontText}
+          onChange={(e) => onChange(index, 'frontText', e.target.value)}
+          disabled={disabled}
+        />
+        <input
+          type="text"
+          className="input input-bordered w-full focus:outline-none focus:ring focus:ring-primary/25"
+          placeholder="Back Text"
+          value={backText}
+          onChange={(e) => onChange(index, 'backText', e.target.value)}
+          disabled={disabled}
+        />
+      </div>
     </div>
-  </div>
-);
+  );
+};
 
 export default DeckFlashcardFields;

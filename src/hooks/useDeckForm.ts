@@ -1,16 +1,7 @@
 import { useCallback, useState } from 'react';
+import type { UseDeckFormOptions } from '@/interface/deckFormOptions';
 import type { DeckCreateRequestDto, FlashcardCreateRequestDto } from '@/type/deckApi';
 
-export interface UseDeckFormOptions {
-  initialName?: string;
-  initialDescription?: string;
-  initialFlashcards?: FlashcardCreateRequestDto[];
-  onSubmitDeck: (data: DeckCreateRequestDto | Partial<DeckCreateRequestDto>) => Promise<boolean> | boolean;
-  folderId?: number; // needed for create
-  isEdit?: boolean;
-}
-
-// Encapsulates form state/logic for create & edit deck
 export function useDeckForm({
   initialName = '',
   initialDescription = '',
@@ -27,6 +18,13 @@ export function useDeckForm({
 
   const addFlashcard = useCallback(() => {
     setFlashcards(prev => [...prev, { frontText: '', backText: '' }]);
+  
+    setTimeout(() => {
+      window.scrollTo({
+        top: document.body.scrollHeight,
+        behavior: 'smooth'
+      });
+    }, 300);
   }, []);
 
   const removeFlashcard = useCallback((index: number) => {
