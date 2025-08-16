@@ -6,7 +6,7 @@ import UsernameInput from "@/components/ui/form/UsernameInput";
 import { useLoginRegister } from "@/hooks/useLoginRegister";
 import { refresh, getUser } from "@/utils/api";
 import { setUser } from "@/utils/authStorage";
-
+import { cleanStorage } from "@/utils/cleanStorage";
 export default function LoginPage() {
   const [username, setUsername] = useState("");
   const [rememberMe, setRememberMe] = useState(false);
@@ -17,6 +17,7 @@ export default function LoginPage() {
  useEffect(() => {
     (async () => {
       try {
+        cleanStorage()
         const { data } = await refresh();
         const profile = await getUser(data.userId);
         setUser({
