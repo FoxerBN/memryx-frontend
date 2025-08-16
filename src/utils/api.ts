@@ -61,3 +61,6 @@ export const deleteDeck = (id: number) =>
   api.delete<{ message: string }>(`/api/decks/${id}`);
 
 
+// ========== FLASHCARD API functions ==========
+export const getFlashcardsByDeck = (deckId: number) =>
+  api.get<DeckDto>(`/api/decks/${deckId}`);
