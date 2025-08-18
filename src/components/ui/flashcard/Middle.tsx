@@ -14,7 +14,10 @@ import {
   useDraggable,
 } from "@dnd-kit/core";
 import FlashcardProgress from "@/components/ui/flashcard/FlashcardProgress";
-import type { DragEndEvent } from "@dnd-kit/core/dist/types";
+import FinalScreen from "@/components/ui/flashcard/screen/FinalScreen";
+import NoCardsScreen from "@/components/ui/flashcard/screen/NoCardScreen";
+import { useStillLearningSession } from "@/hooks/useStillLearningSession";
+import { useFlashcardNavigation } from "@/hooks/useFlashcardNavigation";
 
 type Card = {
   id: string | number;
@@ -38,37 +41,7 @@ interface FlashcardSetProps {
 
 const Middle = forwardRef<MiddleHandle, FlashcardSetProps>(
   ({ cards, startIndex = 0, onCountChange }, ref) => {
-    const [index, setIndex] = useState(startIndex);
-    const [known, setKnown] = useState(0);
-    const [learning, setLearning] = useState(0);
-    const [isFlipped, setIsFlipped] = useState(false);
-    const [dragActive, setDragActive] = useState(false);
-
-    // Track which cards are marked as still learning
-    const [stillLearningCards, setStillLearningCards] = useState<
-      Set<string | number>
-    >(new Set());
-
-    // Track card history for proper back navigation
-    const [cardHistory, setCardHistory] = useState<
-      Array<{
-        cardId: string | number;
-        category: "known" | "learning" | "none";
-      }>
-    >([]);
-
-    const [showFinalScreen, setShowFinalScreen] = useState(false);
-
-    // Still learning mode
-    const [isStillLearningMode, setIsStillLearningMode] = useState(false);
     const [originalCards, setOriginalCards] = useState<Card[]>([]);
-
-    // Snapshot kariet pre jednu still-learning session (stabilné počas session)
-    const [stillLearningSessionCards, setStillLearningSessionCards] = useState<
-      Card[]
-    >([]);
-    const [stillLearningSessionTotal, setStillLearningSessionTotal] =
-      useState(0);
 
     // Initialize original cards
     useEffect(() => {
@@ -76,6 +49,18 @@ const Middle = forwardRef<MiddleHandle, FlashcardSetProps>(
         setOriginalCards(cards);
       }
     }, [cards, originalCards.length]);
+
+    // Use the still learning session hook
+    const {
+      isStillLearningMode,
+      stillLearningCards,
+      stillLearningSessionCards,
+      stillLearningSessionTotal,
+      addToStillLearning,
+      removeFromStillLearning,
+      startStillLearningSession: startStillLearningSessionHook,
+      resetStillLearningState,
+    } = useStillLearningSession(originalCards);
 
     // Current cards to display (snapshot v still-learning mode)
     const currentCards = isStillLearningMode ? stillLearningSessionCards : cards;
@@ -85,204 +70,60 @@ const Middle = forwardRef<MiddleHandle, FlashcardSetProps>(
       ? stillLearningSessionTotal
       : currentCards.length;
 
+    // Use the flashcard navigation hook
+    const {
+      index,
+      known,
+      learning,
+      isFlipped,
+      dragActive,
+      showFinalScreen,
+      current,
+      setIsFlipped,
+      reset,
+      restartForCurrentCards,
+      handleDragStart,
+      handleDragEnd,
+      previousCard,
+    } = useFlashcardNavigation({
+      currentCards,
+      isStillLearningMode,
+      addToStillLearning,
+      removeFromStillLearning,
+      resetStillLearningState,
+      onCountChange,
+      startIndex,
+    });
+
     const sensors = useSensors(
       useSensor(PointerSensor, { activationConstraint: { distance: 12 } })
     );
 
-    const current = currentCards[index];
-
-    const reset = () => {
-      setIsStillLearningMode(false);
-      setIndex(0);
-      setKnown(0);
-      setLearning(0);
-      setIsFlipped(false);
-      setDragActive(false);
-      setStillLearningCards(new Set());
-      setCardHistory([]);
-      setShowFinalScreen(false);
-      setStillLearningSessionCards([]);
-      setStillLearningSessionTotal(0);
-    };
-
     const startStillLearningSession = () => {
-      // Switch to still learning mode a vytvor snapshot
-      setIsStillLearningMode(true);
-      setIndex(0);
-      setKnown(0);
-      setLearning(0);
-      setIsFlipped(false);
-      setCardHistory([]);
-      setShowFinalScreen(false);
-
-      const session = originalCards.filter((card) =>
-        stillLearningCards.has(card.id)
-      );
-      setStillLearningSessionCards(session);
-      setStillLearningSessionTotal(session.length);
+      // Start still learning session via hook, then restart navigation state without clearing SL set
+      startStillLearningSessionHook();
+      restartForCurrentCards();
     };
 
-    useImperativeHandle(ref, () => ({ reset }), []);
-
-    const handleDragStart = () => setDragActive(true);
-
-    const nextCard = () => {
-      setIsFlipped(false);
-      setIndex((prev) => {
-        const nextIndex = Math.min(prev + 1, currentCards.length);
-        if (nextIndex >= currentCards.length) {
-          setShowFinalScreen(true);
-        }
-        return nextIndex;
-      });
-    };
-
-    const previousCard = () => {
-      if (index === 0) return;
-
-      setIsFlipped(false);
-      setIndex((prev) => Math.max(prev - 1, 0));
-
-      if (cardHistory.length > 0) {
-        const lastEntry = cardHistory[cardHistory.length - 1];
-
-        if (lastEntry.category === "known") {
-          // Decrement known count
-          setKnown((k) => Math.max(k - 1, 0));
-
-          // V still-learning mode kartu vrátime späť do setu (snapshot sa tým nemení)
-          if (isStillLearningMode) {
-            setStillLearningCards((prev) => new Set([...prev, lastEntry.cardId]));
-          }
-        } else if (lastEntry.category === "learning") {
-          // Decrement learning count
-          setLearning((l) => Math.max(l - 1, 0));
-
-          // Len v normálnom režime odoberáme zo stillLearningCards
-          if (!isStillLearningMode) {
-            setStillLearningCards((prev) => {
-              const newSet = new Set(prev);
-              newSet.delete(lastEntry.cardId);
-              return newSet;
-            });
-          }
-        }
-
-        // Remove last entry from history
-        setCardHistory((prev) => prev.slice(0, -1));
-      }
-
-      setShowFinalScreen(false);
-    };
-
-    const handleDragEnd = (e: DragEndEvent) => {
-      setDragActive(false);
-
-      const translated = e.active.rect.current.translated;
-      if (!translated || !current) return;
-
-      const { width, left, right } = translated;
-      const vw = window.innerWidth;
-
-      const oneThird = width / 3;
-      const crossesRight = left >= vw - oneThird;
-      const crossesLeft = right <= oneThird;
-
-      if (crossesRight) {
-        // Mark as known
-        setKnown((k) => {
-          const next = k + 1;
-          onCountChange?.({ known: next, learning, index });
-          return next;
-        });
-
-        // DÔLEŽITÉ: Aj v still-learning mode vyhoď kartu zo setu,
-        // aby ďalšia session obsahovala už len tie, čo zostali
-        setStillLearningCards((prev) => {
-          const newSet = new Set(prev);
-          newSet.delete(current.id);
-          return newSet;
-        });
-
-        setCardHistory((prev) => [
-          ...prev,
-          { cardId: current.id, category: "known" },
-        ]);
-        nextCard();
-        return;
-      }
-
-      if (crossesLeft) {
-        // Mark as still learning
-        setLearning((l) => {
-          const next = l + 1;
-          onCountChange?.({ known, learning: next, index });
-          return next;
-        });
-
-        // Do setu pridávame len v normálnom režime.
-        // V still-learning mode tam už karta je; ak by si sa k nej vrátila „Backom“
-        // zo stavu known, previousCard ju do setu opäť pridá.
-        if (!isStillLearningMode) {
-          setStillLearningCards((prev) => new Set([...prev, current.id]));
-        }
-
-        setCardHistory((prev) => [
-          ...prev,
-          { cardId: current.id, category: "learning" },
-        ]);
-        nextCard();
-        return;
-      }
-    };
-
-    const handleResetClick = () => {
-      reset();
-    };
+    useImperativeHandle(ref, () => ({ reset }), [reset]);
 
     // Final screen when all cards are done
     if (showFinalScreen || (!current && index >= currentCards.length)) {
       return (
-        <div className="w-full h-full grid place-items-center px-4">
-          <div className="flex flex-col items-center gap-4">
-            <FlashcardProgress
-              known={known}
-              learning={learning}
-              index={progressTotal}
-              total={progressTotal}
-            />
-            <div className="bg-base-100 border rounded-2xl shadow p-8 text-center">
-              <div className="text-lg font-semibold mb-4">Session Complete!</div>
-              {stillLearningCards.size > 0 && (
-                <div className="text-sm opacity-70 mb-4">
-                  You have {stillLearningCards.size} cards marked for review
-                </div>
-              )}
-            </div>
-            <div className="flex gap-2">
-              <button className="btn btn-outline" onClick={reset}>
-                {isStillLearningMode ? "Back to All Cards" : "Restart All Cards"}
-              </button>
-              {stillLearningCards.size > 0 && (
-                <button
-                  className="btn btn-primary"
-                  onClick={startStillLearningSession}
-                >
-                  Practice Still Learning ({stillLearningCards.size})
-                </button>
-              )}
-            </div>
-          </div>
-        </div>
+        <FinalScreen
+          known={known}
+          learning={learning}
+          total={progressTotal}
+          isStillLearningMode={isStillLearningMode}
+          stillLearningCardsCount={stillLearningCards.size}
+          onReset={reset}
+          onStartStillLearning={startStillLearningSession}
+        />
       );
     }
 
     if (!current) {
-      return (
-        <div className="w-full h-full grid place-items-center px-4">
-          <div className="text-lg">No cards available</div>
-        </div>
-      );
+      return <NoCardsScreen />;
     }
 
     return (
@@ -356,7 +197,7 @@ const Middle = forwardRef<MiddleHandle, FlashcardSetProps>(
           >
             ← Back
           </button>
-          <button className="btn btn-sm btn-neutral" onClick={handleResetClick}>
+          <button className="btn btn-sm btn-neutral" onClick={reset}>
             Reset
           </button>
         </div>
