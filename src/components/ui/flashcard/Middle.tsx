@@ -18,7 +18,8 @@ import FinalScreen from "@/components/ui/flashcard/screen/FinalScreen";
 import NoCardsScreen from "@/components/ui/flashcard/screen/NoCardScreen";
 import { useStillLearningSession } from "@/hooks/useStillLearningSession";
 import { useFlashcardNavigation } from "@/hooks/useFlashcardNavigation";
-
+import { IoArrowBack } from "react-icons/io5";
+import { RiResetLeftLine } from "react-icons/ri";
 type Card = {
   id: string | number;
   front: React.ReactNode;
@@ -189,16 +190,16 @@ const Middle = forwardRef<MiddleHandle, FlashcardSetProps>(
           .card-back { transform: rotateY(180deg); }
         `}</style>
 
-        <div className="flex w-full flex-row justify-evenly items-center mt-7">
+        <div className="flex w-full flex-row justify-around items-center mt-7">
           <button
             onClick={previousCard}
             disabled={index === 0}
             className="btn btn-ghost btn-sm"
           >
-            ← Back
+            <IoArrowBack size={26} />
           </button>
-          <button className="btn btn-sm btn-neutral" onClick={reset}>
-            Reset
+          <button className="btn btn-sm btn-ghost" onClick={reset}>
+            <RiResetLeftLine size={26} />
           </button>
         </div>
       </div>

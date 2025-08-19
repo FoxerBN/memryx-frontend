@@ -1,10 +1,12 @@
 import React from "react";
+import { FaCheck } from "react-icons/fa";
+import { RxCross2 } from "react-icons/rx";
 
 interface FlashcardProgressProps {
   known: number;
   learning: number;
-  index: number; // 0-based index aktuálnej karty
-  total: number; // počet kariet v sete
+  index: number;
+  total: number;
   className?: string;
 }
 
@@ -20,13 +22,19 @@ const FlashcardProgress: React.FC<FlashcardProgressProps> = ({
 
   return (
     <div className={`flex flex-col items-center gap-2 ${className ?? ""}`}>
-      <progress className="progress w-56" value={value} max={100}></progress>
-      <div className="text-sm opacity-70 tabular-nums">
-        known: <span className="font-semibold">{known}</span>
-        {"\u00A0\u00A0"}·{"\u00A0\u00A0"}
-        still learning: <span className="font-semibold">{learning}</span>
-        {"\u00A0\u00A0"}·{"\u00A0\u00A0"}
-        {clamped}/{total}
+      <progress className="progress w-80" value={value} max={100}></progress>
+      <div className="flex items-center justify-between w-56 text-sm opacity-70 tabular-nums">
+        <div className="flex badge badge-outline badge-error items-center gap-1">
+          <RxCross2 className="text-red-500" />
+          <span className="font-semibold text-base-content">{learning}</span>
+        </div>
+        <div className="font-medium">
+          {clamped}/{total}
+        </div>
+        <div className="flex badge badge-outline badge-success items-center gap-1">
+          <FaCheck className="text-green-500" />
+          <span className="font-semibold text-base-content">{known}</span>
+        </div>
       </div>
     </div>
   );

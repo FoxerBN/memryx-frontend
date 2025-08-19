@@ -1,5 +1,6 @@
 import React, { useState } from "react";
-import { IoArrowBackOutline, IoSettingsOutline } from "react-icons/io5";
+import { IoArrowBackOutline } from "react-icons/io5";
+import { IoMdOptions } from "react-icons/io";
 import { useNavigate } from "react-router-dom";
 import type { FlashcardNavigationProps } from "@/interface/flashcardNavigationProps";
 
@@ -44,7 +45,7 @@ const FlashcardNavigation: React.FC<FlashcardNavigationProps> = ({
         aria-label="Settings"
         data-state={isSettingsOpen ? "open" : "closed"}
       >
-        <IoSettingsOutline className="text-2xl" />
+        <IoMdOptions className="text-2xl" />
       </button>
     </div>
   );
