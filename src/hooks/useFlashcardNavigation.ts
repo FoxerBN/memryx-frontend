@@ -114,7 +114,7 @@ export function useFlashcardNavigation({
     const { width, left, right } = translated;
     const vw = window.innerWidth;
 
-    const oneThird = width / 3;
+    const oneThird = width / 2;
     const crossesRight = left >= vw - oneThird;
     const crossesLeft = right <= oneThird;
 

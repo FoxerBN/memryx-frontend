@@ -1,4 +1,11 @@
 import FlashcardProgress from "@/components/ui/flashcard/FlashcardProgress";
+import {
+  RiTrophyLine,
+  RiThumbUpLine,
+  RiLightbulbLine,
+  RiFireLine,
+  RiQuestionLine,
+} from "react-icons/ri";
 
 interface FinalScreenProps {
   known: number;
@@ -20,38 +27,44 @@ export default function FinalScreen({
   onStartStillLearning,
 }: FinalScreenProps) {
   const getPerformanceState = () => {
-    if (total === 0) return { message: "No cards to practice!", emoji: "🤔", color: "text-base-content" };
-    
+    if (total === 0)
+      return {
+        message: "No cards to practice!",
+        Icon: RiQuestionLine,
+        color: "text-base-content",
+      };
+
     const percentage = (known / total) * 100;
-    
+
     if (percentage >= 80) {
       return {
-        message: "You are the best! Excellent work! 🌟",
-        emoji: "🎉",
-        color: "text-success"
+        message: "You are the best! Excellent work!",
+        Icon: RiTrophyLine,
+        color: "text-success",
       };
     } else if (percentage >= 50) {
       return {
-        message: "Pretty good! Keep trying, you're making progress! 💪",
-        emoji: "👍",
-        color: "text-info"
+        message: "Pretty good! Keep trying, you're making progress!",
+        Icon: RiThumbUpLine,
+        color: "text-info",
       };
     } else if (percentage >= 30) {
       return {
-        message: "Keep learning and be better! You're on the right track! 📚",
-        emoji: "💡",
-        color: "text-warning"
+        message: "Keep learning and be better! You're on the right track!",
+        Icon: RiLightbulbLine,
+        color: "text-warning",
       };
     } else {
       return {
-        message: "Try it again and focus more! Practice makes perfect! 🎯",
-        emoji: "🔥",
-        color: "text-error"
+        message: "Try it again and focus more! Practice makes perfect!",
+        Icon: RiFireLine,
+        color: "text-error",
       };
     }
   };
 
   const performanceState = getPerformanceState();
+  const Icon = performanceState.Icon;
   const percentage = total > 0 ? Math.round((known / total) * 100) : 0;
 
   return (
@@ -63,10 +76,14 @@ export default function FinalScreen({
           index={total}
           total={total}
         />
-        <div className="bg-base-100 border rounded-2xl shadow p-8 text-center">
+        <div className="bg-base-100 border rounded-2xl flex flex-col items-center shadow p-8 text-center">
           <div className="text-lg font-semibold mb-2">Session Complete!</div>
-          <div className="text-2xl mb-2">{performanceState.emoji}</div>
-          <div className={`text-base font-medium mb-4 ${performanceState.color}`}>
+          <div className="text-2xl mb-2">
+            <Icon />
+          </div>
+          <div
+            className={`text-base font-medium mb-4 ${performanceState.color}`}
+          >
             {performanceState.message}
           </div>
           <div className="text-sm opacity-70 mb-2">

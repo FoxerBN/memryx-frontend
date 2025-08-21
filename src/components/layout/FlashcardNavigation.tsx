@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import { IoArrowBackOutline } from "react-icons/io5";
 import { IoMdOptions } from "react-icons/io";
 import { useNavigate } from "react-router-dom";
@@ -8,9 +8,9 @@ const FlashcardNavigation: React.FC<FlashcardNavigationProps> = ({
   deckName = "set1",
   onBackClick,
   onToggleSettings,
+  settingsOpen = false,
 }) => {
   const navigate = useNavigate();
-  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
 
   const onBack = () => {
     if (onBackClick) onBackClick();
@@ -18,11 +18,8 @@ const FlashcardNavigation: React.FC<FlashcardNavigationProps> = ({
   };
 
   const toggleSettings = () => {
-    setIsSettingsOpen((prev) => {
-      const next = !prev;
-      onToggleSettings?.(next);
-      return next;
-    });
+    const next = !settingsOpen;
+    onToggleSettings?.(next);
   };
 
   return (
@@ -43,7 +40,8 @@ const FlashcardNavigation: React.FC<FlashcardNavigationProps> = ({
         className="btn btn-ghost btn-circle"
         onClick={toggleSettings}
         aria-label="Settings"
-        data-state={isSettingsOpen ? "open" : "closed"}
+        data-state={settingsOpen ? "open" : "closed"}
+        aria-expanded={settingsOpen}
       >
         <IoMdOptions className="text-2xl" />
       </button>
