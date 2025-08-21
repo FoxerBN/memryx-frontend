@@ -64,7 +64,9 @@ const Middle = forwardRef<MiddleHandle, FlashcardSetProps>(
     } = useStillLearningSession(originalCards);
 
     // Current cards to display (snapshot v still-learning mode)
-    const currentCards = isStillLearningMode ? stillLearningSessionCards : cards;
+    const currentCards = isStillLearningMode
+      ? stillLearningSessionCards
+      : cards;
 
     // Total for progress bar - fixed during still learning session
     const progressTotal = isStillLearningMode
@@ -97,7 +99,7 @@ const Middle = forwardRef<MiddleHandle, FlashcardSetProps>(
     });
 
     const sensors = useSensors(
-      useSensor(PointerSensor, { activationConstraint: { distance: 12 } })
+      useSensor(PointerSensor, { activationConstraint: { distance: 12 } }),
     );
 
     const startStillLearningSession = () => {
@@ -225,7 +227,7 @@ const Middle = forwardRef<MiddleHandle, FlashcardSetProps>(
         </div>
       </div>
     );
-  }
+  },
 );
 
 Middle.displayName = "Middle";
@@ -263,7 +265,7 @@ const FlipDraggableCard: React.FC<{
       cursor: isDragging ? "grabbing" : "grab",
       touchAction: "none",
     }),
-    [transform, isDragging]
+    [transform, isDragging],
   );
 
   return (
