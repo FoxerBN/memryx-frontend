@@ -24,6 +24,7 @@ export default function OneFolder() {
 
   // 1) predvyplň názov z cache (ak existuje)
   const userId = getStoredUser()?.userId ?? null;
+  const displayName = getStoredUser()?.displayName ?? "User";
   const cachedName =
     userId != null
       ? loadFolders(userId)?.folders.find((f) => f.id === folderId)?.name ?? ""
@@ -71,7 +72,7 @@ export default function OneFolder() {
       <FolderNavigation
         onBack={() => navigate("/home")}
         onAdd={() => navigate(`/folder/${folderId}/create-deck`)}
-        username={"guest"}
+        username={displayName}
       />
 
       <div className="flex flex-col items-center mb-6">
