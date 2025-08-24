@@ -17,7 +17,7 @@ const FlashcardProgress: React.FC<FlashcardProgressProps> = ({
   total,
   className,
 }) => {
-  const clamped = Math.max(0, Math.min(index, total)); // 0..total
+  const clamped = Math.max(0, Math.min(index, total));
   const value = total > 0 ? Math.round((clamped / total) * 100) : 0;
 
   return (
