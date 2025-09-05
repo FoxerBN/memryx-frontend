@@ -108,6 +108,29 @@ const Middle = forwardRef<MiddleHandle, FlashcardSetProps>(
 
     useImperativeHandle(ref, () => ({ reset }), [reset]);
 
+    // Simple helper + component: ensure consistent responsive font sizing based on text length
+    // This prevents font-size jumps between the card and the drag overlay and keeps long text readable.
+    const getText = (node: React.ReactNode) =>
+      typeof node === "string" ? node : node == null ? "" : String(node);
+
+    const CardContent: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+      const txt = getText(children).trim();
+      const len = txt.length;
+      const fontSize =
+        len > 150
+          ? "clamp(0.9rem, 2.4vw, 1.05rem)"
+          : "clamp(1.55rem, 4vw, 2rem)"; 
+
+      return (
+        <div
+          className="text-center break-words hyphens-auto w-full"
+          style={{ fontSize, lineHeight: 1.3 }}
+        >
+          {children}
+        </div>
+      );
+    };
+
     // Final screen when all cards are done
     if (showFinalScreen || (!current && index >= currentCards.length)) {
       return (
@@ -148,10 +171,8 @@ const Middle = forwardRef<MiddleHandle, FlashcardSetProps>(
             draggableId={`card-${current.id}`}
           >
             {{
-              front: (
-                <div className="text-3xl text-center">{current.front}</div>
-              ),
-              back: <div className="text-3xl text-center">{current.back}</div>,
+              front: <CardContent>{current.front}</CardContent>,
+              back: <CardContent>{current.back}</CardContent>,
             }}
           </FlipDraggableCard>
 
@@ -165,14 +186,12 @@ const Middle = forwardRef<MiddleHandle, FlashcardSetProps>(
                 >
                   <div className="card-face card-front">
                     <InnerSurface>
-                      <div className="text-3xl text-center">
-                        {current.front}
-                      </div>
+                      <CardContent>{current.front}</CardContent>
                     </InnerSurface>
                   </div>
                   <div className="card-face card-back">
                     <InnerSurface>
-                      <div className="text-3xl text-center">{current.back}</div>
+                      <CardContent>{current.back}</CardContent>
                     </InnerSurface>
                   </div>
                 </div>
@@ -188,6 +207,8 @@ const Middle = forwardRef<MiddleHandle, FlashcardSetProps>(
           .card-flipped { transform: rotateY(180deg); }
           .card-face { position: absolute; inset: 0; backface-visibility: hidden; display:flex; align-items:center; justify-content:center; }
           .card-back { transform: rotateY(180deg); }
+          .break-words { word-break: break-word; }
+          .hyphens-auto { hyphens: auto; }
         `}</style>
 
         <div className="flex w-full flex-row justify-around items-center mt-7">

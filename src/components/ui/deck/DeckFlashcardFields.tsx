@@ -47,16 +47,28 @@ const DeckFlashcardFields: React.FC<FlashcardFieldProps> = ({
           className="input input-bordered w-full focus:outline-none focus:ring focus:ring-primary/25"
           placeholder="Front Text"
           value={frontText}
-          onChange={(e) => onChange(index, 'frontText', e.target.value)}
+          onChange={(e) => {
+            const value = e.target.value;
+            if (value.length <= 350) {
+              onChange(index, 'frontText', value);
+            }
+          }}
           disabled={disabled}
+          maxLength={350}
         />
         <input
           type="text"
           className="input input-bordered w-full focus:outline-none focus:ring focus:ring-primary/25"
           placeholder="Back Text"
           value={backText}
-          onChange={(e) => onChange(index, 'backText', e.target.value)}
+          onChange={(e) => {
+            const value = e.target.value;
+            if (value.length <= 350) {
+              onChange(index, 'backText', value);
+            }
+          }}
           disabled={disabled}
+          maxLength={350}
         />
       </div>
     </div>
