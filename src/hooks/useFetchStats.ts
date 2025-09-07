@@ -47,6 +47,10 @@ export const useFetchStats = (): UseFetchStatsReturn => {
         globalCounts: globalResponse.data,
         personalCounts: personalResponse.data,
       });
+      console.log("Fetched stats:", {
+        global: globalResponse.data,
+        personal: personalResponse.data,
+      });
     } catch (e) {
       const ax = e as AxiosError<CustomAxiosError>;
       setError(ax?.message || "Failed to fetch stats");

@@ -1,3 +1,7 @@
+import { TbFolder } from "react-icons/tb";
+import { PiCardsThree } from "react-icons/pi";
+import { CgCardHearts } from "react-icons/cg";
+
 interface CountsData {
   flashcards: number;
   decks: number;
@@ -24,22 +28,25 @@ const PersonalStats = ({
         <div className="stats bg-base-200 stats-vertical shadow">
           <div className="stat">
             <div className="stat-title text-center">Flashcards</div>
-            <div className="stat-value">
+            <div className="stat-value flex items-center justify-center gap-1.5">
               {loading ? "..." : personalCounts?.flashcards || "0"}
+              <CgCardHearts size={24} />
             </div>
           </div>
 
           <div className="stat">
             <div className="stat-title text-center">Decks</div>
-            <div className="stat-value">
+            <div className="stat-value flex items-center justify-center gap-1.5">
               {loading ? "..." : personalCounts?.decks || "0"}
+              <PiCardsThree size={24} className="rotate-90" />
             </div>
           </div>
 
           <div className="stat">
             <div className="stat-title text-center">Folders</div>
-            <div className="stat-value">
+            <div className="stat-value flex items-center justify-center gap-1.5">
               {loading ? "..." : personalCounts?.folders || "0"}
+              <TbFolder size={24} />
             </div>
           </div>
         </div>
@@ -50,22 +57,25 @@ const PersonalStats = ({
         <div className="stats bg-base-200 stats-vertical shadow">
           <div className="stat">
             <div className="stat-title text-center">Flashcards</div>
-            <div className="stat-value">
+            <div className="stat-value flex items-center justify-center gap-1.5">
               {loading ? "..." : globalCounts?.flashcards || "0"}
+              <CgCardHearts size={24} />
             </div>
           </div>
 
           <div className="stat">
             <div className="stat-title text-center">Decks</div>
-            <div className="stat-value">
+            <div className="stat-value flex items-center justify-center gap-1.5">
               {loading ? "..." : globalCounts?.decks || "0"}
+              <PiCardsThree size={24} className="rotate-90" />
             </div>
           </div>
 
           <div className="stat">
             <div className="stat-title text-center">Folders</div>
-            <div className="stat-value">
+            <div className="stat-value flex items-center justify-center gap-1.5">
               {loading ? "..." : globalCounts?.folders || "0"}
+              <TbFolder size={24} />
             </div>
           </div>
         </div>

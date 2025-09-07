@@ -25,6 +25,10 @@ export const register = (payload: { username: string; displayName: string }) =>
 export const refresh = () => api.post("/api/auth/refresh");
 export const logout = () => api.post("/api/auth/logout");
 
+export const deleteAccount = (id: number) =>{
+  return api.delete("/api/user/" + id)
+}
+
 // ========== USER API functions ==========
 
 export const getUser = (id: number) => api.get<AppUser>(`/api/user/${id}`);
